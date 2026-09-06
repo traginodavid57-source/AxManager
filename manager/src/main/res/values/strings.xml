@@ -233,4 +233,5 @@
     <string name="plugin_editor_auth_install_title">Authorize Plugin Installation</string>
     <string name="plugin_editor_auth_install_msg">Do you authorize the installation of plugin \"%1$s\" (%2$s) in AxManager? The plugin will be packaged and installed now.</string>
     <string name="plugin_editor_open_in_manual">Open in Manual Editor</string>
+    <string name="delete">Delete</string>
 </resources>

@@ -233,4 +233,5 @@
     <string name="plugin_editor_auth_install_title">Otorisasi Instalasi Plugin</string>
     <string name="plugin_editor_auth_install_msg">Apakah Anda mengizinkan pemasangan plugin \"%1$s\" (%2$s) di AxManager? Plugin akan dikemas dan diinstal sekarang.</string>
     <string name="plugin_editor_open_in_manual">Buka di Editor Manual</string>
+    <string name="delete">Hapus</string>
 </resources>

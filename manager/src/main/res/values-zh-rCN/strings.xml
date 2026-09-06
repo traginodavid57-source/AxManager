@@ -233,4 +233,5 @@
     <string name="plugin_editor_auth_install_title">授权安装插件</string>
     <string name="plugin_editor_auth_install_msg">您是否授权在 AxManager 中安装插件“%1$s”（%2$s）？插件将立即打包并安装。</string>
     <string name="plugin_editor_open_in_manual">在手动编辑器中打开</string>
+    <string name="delete">删除</string>
 </resources>
