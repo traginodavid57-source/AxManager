@@ -15,11 +15,29 @@ import frb.axeron.api.AxeronCommandSession
 import frb.axeron.api.core.AxeronSettings
 import frb.axeron.api.utils.AnsiFilter
 import frb.axeron.axerish.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class QuickShellViewModel(application: Application) : AndroidViewModel(application) {
+
+    var installedPackages: List<String> by mutableStateOf(emptyList())
+        private set
+
+    fun loadInstalledPackages() {
+        if (installedPackages.isNotEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val pm = getApplication<Application>().packageManager
+                val packages = pm.getInstalledPackages(0).map { it.packageName }
+                withContext(Dispatchers.Main) {
+                    installedPackages = packages
+                }
+            } catch (_: Exception) {}
+        }
+    }
 
     var session: AxeronCommandSession = AxeronCommandSession()
     private var savedCommand: TextFieldValue? = null

@@ -30,7 +30,9 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Info
+import frb.axeron.manager.ai.GeminiConfigBottomSheet
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -102,12 +104,18 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewModelG
     val scope = rememberCoroutineScope()
 
     var showDevDialog by remember { mutableStateOf(false) }
+    var showGeminiConfigDialog by remember { mutableStateOf(false) }
 
     DeveloperInfo(
         showDevDialog
     ) {
         showDevDialog = false
     }
+
+    GeminiConfigBottomSheet(
+        showDialog = showGeminiConfigDialog,
+        onDismissRequest = { showGeminiConfigDialog = false }
+    )
 
     Scaffold(
         topBar = {
@@ -366,6 +374,16 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewModelG
                     label = stringResource(R.string.developer),
                     onClick = {
                         navigator.navigate(DeveloperScreenDestination)
+                    }
+                )
+
+                SettingsItem(
+                    type = SettingsItemType.CHILD,
+                    iconVector = Icons.Outlined.AutoAwesome,
+                    label = stringResource(R.string.gemini_ai_assistant),
+                    description = stringResource(R.string.gemini_ai_desc),
+                    onClick = {
+                        showGeminiConfigDialog = true
                     }
                 )
 

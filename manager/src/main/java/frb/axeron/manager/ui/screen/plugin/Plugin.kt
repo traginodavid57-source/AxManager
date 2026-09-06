@@ -22,8 +22,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.MoreVert
+import frb.axeron.manager.ai.GeminiConfigBottomSheet
+import frb.axeron.manager.ai.GeminiPluginBottomSheet
+import frb.axeron.manager.ai.PluginFile
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -120,6 +125,10 @@ fun PluginScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewModelGlo
     ) { pluginViewModel.fetchModuleList() }
 
     var showExtraDialog by remember { mutableStateOf(false) }
+    var showAiPluginDialog by remember { mutableStateOf(false) }
+    var showGeminiConfigDialog by remember { mutableStateOf(false) }
+    var showManualEditorDialog by remember { mutableStateOf(false) }
+    var manualEditorInitialFiles by remember { mutableStateOf<List<PluginFile>?>(null) }
 
     ExtraFilterSettings(
         showExtraDialog,
@@ -128,6 +137,48 @@ fun PluginScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewModelGlo
     ) {
         showExtraDialog = false
     }
+
+    ManualPluginEditorBottomSheet(
+        showDialog = showManualEditorDialog,
+        onDismissRequest = {
+            showManualEditorDialog = false
+            manualEditorInitialFiles = null
+        },
+        initialFiles = manualEditorInitialFiles,
+        onInstallPlugin = { zipUri ->
+            showManualEditorDialog = false
+            manualEditorInitialFiles = null
+            val installers = listOf(PluginInstaller(zipUri, autoEnable = true))
+            pluginViewModel.updateZipUris(installers)
+            navigator.navigate(FlashScreenDestination(FlashIt.FlashPlugins(installers)))
+            pluginViewModel.clearZipUris()
+            pluginViewModel.markNeedRefresh()
+        }
+    )
+
+    GeminiPluginBottomSheet(
+        showDialog = showAiPluginDialog,
+        onDismissRequest = { showAiPluginDialog = false },
+        onOpenConfig = { showGeminiConfigDialog = true },
+        onOpenInManualEditor = { files ->
+            showAiPluginDialog = false
+            manualEditorInitialFiles = files
+            showManualEditorDialog = true
+        },
+        onInstallPlugin = { zipUri ->
+            showAiPluginDialog = false
+            val installers = listOf(PluginInstaller(zipUri, autoEnable = true))
+            pluginViewModel.updateZipUris(installers)
+            navigator.navigate(FlashScreenDestination(FlashIt.FlashPlugins(installers)))
+            pluginViewModel.clearZipUris()
+            pluginViewModel.markNeedRefresh()
+        }
+    )
+
+    GeminiConfigBottomSheet(
+        showDialog = showGeminiConfigDialog,
+        onDismissRequest = { showGeminiConfigDialog = false }
+    )
 
     Scaffold(
         topBar = {
@@ -145,6 +196,29 @@ fun PluginScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewModelGlo
                 onClearClick = { pluginViewModel.search = "" },
                 scrollBehavior = scrollBehavior,
                 action = {
+                    IconButton(
+                        onClick = {
+                            manualEditorInitialFiles = null
+                            showManualEditorDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Code,
+                            contentDescription = stringResource(R.string.plugin_editor_manual),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            showAiPluginDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.AutoAwesome,
+                            contentDescription = stringResource(R.string.gemini_create_plugin_with_ai),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(
                         onClick = {
                             showExtraDialog = true

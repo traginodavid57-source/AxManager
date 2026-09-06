@@ -36,7 +36,10 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Bolt
+import frb.axeron.manager.ai.GeminiCommandBottomSheet
+import frb.axeron.manager.ai.GeminiConfigBottomSheet
 import androidx.compose.material.icons.outlined.DoNotTouch
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Output
@@ -161,6 +164,25 @@ fun QuickShellScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewMode
         showExtraDialog = false
     }
 
+    var showAiCommandDialog by remember { mutableStateOf(false) }
+    var showGeminiConfigDialog by remember { mutableStateOf(false) }
+
+    GeminiCommandBottomSheet(
+        showDialog = showAiCommandDialog,
+        onDismissRequest = { showAiCommandDialog = false },
+        onApplyCommand = { generatedCmd ->
+            viewModel.setCommand(androidx.compose.ui.text.input.TextFieldValue(generatedCmd, androidx.compose.ui.text.TextRange(generatedCmd.length)))
+        },
+        onOpenConfig = {
+            showGeminiConfigDialog = true
+        }
+    )
+
+    GeminiConfigBottomSheet(
+        showDialog = showGeminiConfigDialog,
+        onDismissRequest = { showGeminiConfigDialog = false }
+    )
+
 
     Scaffold(
         topBar = {
@@ -192,6 +214,17 @@ fun QuickShellScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewMode
                         enabled = logs.isNotEmpty()
                     ) {
                         Icon(Icons.Filled.ClearAll, contentDescription = null)
+                    }
+                    IconButton(
+                        onClick = {
+                            showAiCommandDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.AutoAwesome,
+                            contentDescription = stringResource(R.string.gemini_generate_with_ai),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                     IconButton(
                         onClick = {
@@ -274,6 +307,7 @@ fun QuickShellScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewMode
 
             // collect flow
             LaunchedEffect(Unit) {
+                viewModel.loadInstalledPackages()
                 viewModel.output.collect { line ->
                     val raw = line.output
 
@@ -430,61 +464,72 @@ fun QuickShellScreen(navigator: DestinationsNavigator, viewModelGlobal: ViewMode
                         }
                     }
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    TextField(
-                        value = viewModel.commandText,
-                        onValueChange = {
-                            viewModel.setCommand(it)
-                        },
-                        label = {
-                            Text(viewModel.execMode)
-                        },
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(
-                            lineHeight = MaterialTheme.typography.bodyLarge.fontSize,
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.Both
-                            ),
-                            fontFamily = FontFamily.Monospace
-                        ),
-                        maxLines = if (keyboardVisible) Int.MAX_VALUE else 1,
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = Color.Transparent,   // garis saat fokus
-                            unfocusedIndicatorColor = Color.Transparent, // garis saat tidak fokus
-                            disabledIndicatorColor = Color.Transparent,   // garis saat disabled
-                            focusedContainerColor = Color.Transparent,   // ⬅ ini penting
-                            unfocusedContainerColor = Color.Transparent, // ⬅ ini juga
-                            disabledContainerColor = Color.Transparent
-                        ),
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .animateContentSize(
-                                animationSpec = tween(
-                                    durationMillis = 250,
-                                    easing = LinearOutSlowInEasing
-                                )
-                            )
-                    )
-
-                    IconButton(
-                        onClick = {
-                            viewModel.runShell()
-                            focusManager.clearFocus()
-                            keyboardController?.hide()
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 12.dp)
-                            .padding(vertical = 4.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_exec),
-                            contentDescription = stringResource(R.string.exec),
-                            modifier = Modifier.size(38.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                        TextField(
+                            value = viewModel.commandText,
+                            onValueChange = {
+                                viewModel.setCommand(it)
+                            },
+                            label = {
+                                Text(viewModel.execMode)
+                            },
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                lineHeight = MaterialTheme.typography.bodyLarge.fontSize,
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.Both
+                                ),
+                                fontFamily = FontFamily.Monospace
+                            ),
+                            maxLines = if (keyboardVisible) Int.MAX_VALUE else 1,
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,   // garis saat fokus
+                                unfocusedIndicatorColor = Color.Transparent, // garis saat tidak fokus
+                                disabledIndicatorColor = Color.Transparent,   // garis saat disabled
+                                focusedContainerColor = Color.Transparent,   // ⬅ ini penting
+                                unfocusedContainerColor = Color.Transparent, // ⬅ ini juga
+                                disabledContainerColor = Color.Transparent
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize(
+                                    animationSpec = tween(
+                                        durationMillis = 250,
+                                        easing = LinearOutSlowInEasing
+                                    )
+                                )
+                        )
+
+                        IconButton(
+                            onClick = {
+                                viewModel.runShell()
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                            },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(end = 12.dp)
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_exec),
+                                contentDescription = stringResource(R.string.exec),
+                                modifier = Modifier.size(38.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    if (!running && viewModel.execMode == "Commands") {
+                        CommandSuggestionsBar(
+                            commandText = viewModel.commandText,
+                            installedPackages = viewModel.installedPackages,
+                            onApply = { viewModel.setCommand(it) },
+                            onOpenAi = { showAiCommandDialog = true }
                         )
                     }
                 }

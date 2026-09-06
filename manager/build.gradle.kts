@@ -19,10 +19,18 @@ android {
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("frb-project")
+            val frbConfig = signingConfigs.findByName("frb-project")
+            signingConfig = if (frbConfig?.storeFile != null && frbConfig.storeFile!!.exists()) {
+                frbConfig
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         release {
-            signingConfig = signingConfigs.getByName("frb-project")
+            val frbConfig = signingConfigs.findByName("frb-project")
+            if (frbConfig?.storeFile != null && frbConfig.storeFile!!.exists()) {
+                signingConfig = frbConfig
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

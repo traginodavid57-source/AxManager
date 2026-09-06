@@ -4,6 +4,8 @@
 
 感谢您的关注！
 
+[View in English](README.md) | [Tradução em Português (Brasil)](README_pt.md)
+
 **AxManager** 是一款 Android 应用，旨在提供对应用和系统的深度控制。
 
 与 *KernelSU* 或其他基于 root 权限的“管理器”等工具不同，**AxManager** 专用于 **ADB/非 root 模式**，同时在设备拥有 **root 权限** 时，也允许执行命令。[了解更多](https://fahrez182.github.io/AxManager/)

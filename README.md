@@ -2,7 +2,7 @@
 
 > **Axeron Manager (AxManager)** is a Proof of Concept (POC) for a self-created environment on Android that leverages ADB permissions to provide system-level control. This project explores the idea of creating a persistent, independent ADB-based execution layer within the system.
 
-[Switch to Chinese translation 切换到中文翻译](README_cn.md)
+[Switch to Chinese translation 切换到中文翻译](README_cn.md) | [Tradução em Português (Brasil)](README_pt.md)
 
 ## 💡 The Concept
 This project is a personal exploration into creating a dedicated **ADB Environment** on Android. Instead of just being a simple command runner, AxManager aims to establish a background infrastructure that can host plugins, manage system optimizations, and provide a unified interface for privileged operations—all without requiring full root access (though it can utilize root if available).
